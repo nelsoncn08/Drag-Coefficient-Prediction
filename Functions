@@ -1,0 +1,262 @@
+def Cd(M):
+
+  ### Calcular o Coeficiente de Arrato do Corpo (Seção 1.1) ###
+
+  # Velocidade do som (ft/s) para 'h<=37000ft'
+  a = -0.004*h + 1116.45
+
+  # Viscosidade dinâmica (ft**2/st)
+  # e^(ah+b), onde 'a=0.00002503' e 'b=0.0' para 'h<= 15000ft'
+  v = 0.000157*np.exp(0.00002503*h)
+
+  # Número de Reynolds Compressível
+  Rn_C_11 = (a*M*L/(12*v))*(1 + 0.0283*M - 0.043*M**2 + 0.2107*M**3 - 0.03829*M**4 + 0.002709*M**5)
+
+  # Coeficiente de atrito incompressível de superfície
+  Cf_I_11 = 0.037036*Rn_C_11**(-0.155079)
+
+  # Coeficiente de atrito compressível de superfície
+  Cf_C_11 = Cf_I_11*(1 + 0.00798*M - 0.1813*M**2 + 0.0632*M**3 - 0.00933*M**4 + 0.000549*M**5)
+
+  # Coeficiente de atrito incompressível de superfície com rugorisade
+  Cf_I_R_11 = 1/(1.89 + 1.62*np.log(L/K))**2.5
+
+  # Coeficiente de atrito compressível de superfície com rugorisade
+  Cf_C_R_11 = Cf_I_R_11/(1 + 0.2044*M**2)
+
+  # Coeficiente de atrito de superfície final
+  if np.greater_equal(Cf_C_11 , Cf_C_R_11):
+    Cf_F_11 = Cf_C_11
+  else:
+    Cf_F_11 = Cf_C_R_11
+  
+  # Coeficiente de arrasto do corpo devido ao atrito
+  Cdf_Body = Cf_F_11*(1 + 60/((L/d)**3) + 0.0025*(L/d))*(4*Sb/(np.pi*d**2))
+
+
+  # ---------------------------------------------------------------------------#
+
+
+  ### Calcular o Coeficiente de Arrasto das Aletas (Seção 1.2) ###
+
+  # Número de Reynolds Compressível
+  Rn_C_12 = (a*M*Cr/(12*v))*(1 + 0.0283*M - 0.043*M**2 + 0.2107*M**3 - 0.03829*M**4 + 0.002709*M**5)
+
+  # Coeficiente de atrito incompressível de superfície
+  Cf_I_12 = 0.037036*Rn_C_12**(-0.155079)
+
+  # Coeficiente de atrito compressível de superfície
+  Cf_C_12 = Cf_I_12*(1 + 0.00798*M - 0.1813*M**2 + 0.0632*M**3 - 0.00933*M**4 + 0.000549*M**5)
+
+  # Coeficiente de atrito incompressível de superfície com rugorisade
+  Cf_I_R_12 = 1/(1.89 + 1.62*np.log(Cr/K))**2.5
+
+  # Coeficiente de atrito compressível de superfície com rugorisade
+  Cf_C_R_12 = Cf_I_R_12/(1 + 0.2044*M**2)
+
+  # Coeficiente de atrito de superfície final
+  if np.greater_equal(Cf_C_12 , Cf_C_R_12):
+    Cf_F_12 = Cf_C_12
+  else:
+    Cf_F_12 = Cf_C_R_12
+
+  # Número de Reynolds Inompressível
+  Re_I_12 = a*M*Cr/(12*v)
+
+  # Lamb -> razão entre a corda do topo da aleta e a corda da base
+  Lamb = Ct/Cr
+
+  # Média de atrito de superfície lisa para cada aleta para 'lam = 0.0'
+  Cfl_0_12 = Cf_F_12*(1 + 0.5646/np.log(Re_I_12))
+
+  # Média de atrito de superfície lisa para cada aleta
+  Cfl_12 = Cf_F_12*((np.log(Re_I_12)**2.6)/(Lamb**2 - 1))*(((Lamb**2)/(np.log(Re_I_12*Lamb)**2.6)) - (1/(np.log(Re_I_12)**2.6)) + 0.5646*((Lamb**2)/(np.log(Re_I_12*Lamb)**3.6) - (1/(np.log(Re_I_12)**3.6))))
+
+  # Coeficiente de atrito devido ao arrasto de todas as aletas
+  Cdf_Fins = Cfl_12*(1 + 60*(t/Cr)**4 + 0.8*(1 + 5*(X_tc_av/Cr)**2)*(t/Cr))*(4*Nf*Sf/(np.pi*d**2))
+
+
+  # ---------------------------------------------------------------------------#
+
+
+  ### Calcular o Arrasto por Atrito nas Protuberâncias (Seção 1.3) ###
+
+  if Protuberancia:
+
+    # Número de Reynolds Compressível
+    Rn_C_13 = (a*M*Lp/(12*v))*(1 + 0.0283*M - 0.043*M**2 + 0.2107*M**3 - 0.03829*M**4 + 0.002709*M**5)
+
+    # Coeficiente de atrito incompressível de superfície
+    Cf_I_13 = 0.037036*Rn_C_13**(-0.155079)
+
+    # Coeficiente de atrito compressível de superfície
+    Cf_C_13 = Cf_I_13*(1 + 0.00798*M - 0.1813*M**2 + 0.0632*M**3 - 0.00933*M**4 + 0.000549*M**5)
+
+    # Coeficiente de atrito incompressível de superfície com rugorisade
+    Cf_I_R_13 = 1/((1.89 + 1.62*np.log(Lp/K))**2.5)
+
+    # Coeficiente de atrito compressível de superfície com rugorisade
+    Cf_C_R_13 = Cf_I_R_13/(1 + 0.2044*M**2)
+
+    # Coeficiente de atrito de superfície final
+    if np.greater_equal(Cf_C_13 , Cf_C_R_13):
+      Cf_F_13 = Cf_C_13
+    else:
+      Cf_F_13 = Cf_C_R_13
+
+    # Distancia da extremidade da coifa até o início da protuberância
+    D_NP_13 = L-Lp # Essa equação está "errada", mas como o acho que o photon não tem protuberâncias, deixei assim mesmo por enquanto
+
+    # Coeficiente de atrito da protuberância
+    Cf_P_13 = 0.8151*Cf_F_13*(D_NP_13/Lp)**(-0.1243)
+
+    # Coeficiente de arrasto da protuberância devido ao atrito
+    Cd_Protuberance = Cf_P_13*(1 + 1.798*((np.sqrt(A)/Lp)**1.5))*4*Sp/(np.pi*d**2)
+
+  else:
+    Cd_Protuberance = 0.0
+
+
+  # ---------------------------------------------------------------------------#
+
+
+  ### Arrasto devido a excrescência (Seção 1.4) ###
+
+  if Excrescencia:
+    # Coeficiente de incrimento de arrasto devido às excrescências
+    def Ke(M):
+      if M < 0.78:
+        return 0.00038
+      elif M >= 0.78 and M <= 1.04:
+        return -0.4501*M**4 + 1.5954*M**3 - 2.1062*M**2 + 1.2288*M - 0.26717
+      elif M > 1.04:
+        return 0.0002*M**2 - 0.0012*M + 0.0018
+
+    # Coeficiente de arrasto devido às excrescências
+    Cd_Excrescencies = Ke(M)*(4*Sb/(np.pi*d**2))
+
+  else:
+    Cd_Excrescencies = 0.0
+
+
+  # ---------------------------------------------------------------------------#
+
+
+  ### Coeficiente de Atrito Total e Interferência de Arrasto (Seção 1.5) ###
+
+  # Valor aproximado, 'Kf = 1.04'
+  Cdf = Cdf_Body + 1.04*Cdf_Fins + 1.04*Cd_Protuberance + Cd_Excrescencies
+
+
+  # ---------------------------------------------------------------------------#
+
+
+  ### Cálculo do Coeficiente de Arrasto de Base para Mach < 0.6 (Seção 2.1) ###
+
+  # Constante de Proporcionalidade
+  Kb = 0.0274*np.arctan((L0/d) + 0.0116)
+
+  # Expoente
+  n = 3.6542*(L0/d)**(-0.2733)
+
+  # Função usada para saber antecipadamente a resposta para Mach=0.6 e então usá-la na função que calcula o coeficiente para qualquer Mach
+  # Não encontrei a equação fb definida para os Números de Mach '0.6, 1 e 2', por isso coloquei da forma que considerei mais cabível
+  # Apesar de que não deve fazer muita diferença, tendo em vista que fb já estava definida para valores infinitesimalmente próximos deles
+  if M < 0.6:
+    fb = 0.0
+  elif M >= 0.6 and M <= 1.0:
+    fb = 1 + 215.8*(M - 0.6)**6
+  elif M > 1.0 and M <= 2.0:
+    fb = 2.0881*((M - 1)**3) - 3.7938*((M - 1)**2) + 1.4618*(M - 1) + 1.883917
+  elif M > 2.0:
+    fb = 0.297*(M - 2)**3 - 0.7937*(M - 2)**2 - 0.1115*(M - 2) + 1.64006
+
+  # Cd_B(M>=0.6)=Cd_B(M=0.6)*fb
+  # Função para usar a equação do Cd_B com 'M = 0.6'
+  def Cd_B_06():
+    M = 0.6
+    return Kb*(((db/d)**n)/np.sqrt(Cdf))
+
+  if M < 0.6:
+    Cd_B = Kb*(((db/d)**n)/np.sqrt(Cdf))
+  elif M >= 0.6:
+    Cd_B = Cd_B_06()
+    Cd_B *= fb
+
+#  if M >= 0.6 and M <= 4.0:
+#    Cd_B = Cd_B_06()
+#    Cd_B *= fb
+#  else:
+#    Cd_B = Kb*(((db/d)**n)/np.sqrt(Cdf))
+
+
+  # ---------------------------------------------------------------------------#
+
+
+  ### Coeficiente de Arrasto de Onda Transônica (Seção 3.0) ###
+
+  # Número de Mach da Divergência de Arrasto Transônico
+  Md = -0.0156*(LN/d)**2 + 0.136*(LN/d) + 0.6817
+
+  # Número de Mach final da região transônica
+
+  def a(LN,Le):
+    if (LN/Le) < 0.2:
+      return 2.4
+    elif (LN/Le) >= 0.2:
+      return -321.94*(LN/Le)**2 + 264.07*(LN/Le) - 36.348
+
+  def b(LN,Le):
+    if (LN/Le) < 0.2:
+      return -1.05
+    elif (LN/Le) >= 0.2:
+      return 19.634*(LN/Le)**2 - 18.369*(LN/Le) + 1.7434
+
+  Mf = a(LN,Le)*(Le/d)**b(LN,Le) + 1.0275
+
+  # Máximo aumento de arrasto na região transônica
+
+  c = 50.676*(LN/Lb)**2 - 51.734*(LN/Lb) + 15.642
+
+  g = -2.2538*(LN/Lb)**2 + 1.3108*(LN/Lb) - 1.7344
+
+  def D_Cd_max(Le,d,c,g):
+    if (Le/d) < 6.0:
+      return c*6**g
+    elif (Le/d) >= 6.0:
+      return c*(Le/d)**g
+
+  # Aumento no arrasto transânico para dado Número de Mach
+
+  x = (M-Md)/(Mf-Md)
+
+  F = -8.3474*x**5 + 24.543*x**4 - 24.946*x**3 + 8.6321*x**2 + 1.1195*x
+
+  def D_Cd_T(Le,d,c,g):
+    if M >= Md and M <= Mf:
+      return D_Cd_max(Le,d,c,g)*F
+    elif M < Md or M > Mf:
+      return 0
+
+
+  # ---------------------------------------------------------------------------#
+
+
+  ### Coeficiente de Arrasto de Onda Supersônica (Seção 4.0) ###
+
+  # Aumento do arrasto supersônico para dado Número de Mach
+  def D_Cd_S(Le,d,c,g):
+    if M >= Mf:
+      return D_Cd_max(Le,d,c,g)
+    elif M < Mf:
+      return 0
+
+
+  # ---------------------------------------------------------------------------#
+
+
+  ### Coeficiente de Arrasto Total (Seção 5.0) ###
+
+  CD_total = Cdf + Cd_B + D_Cd_T(Le,d,c,g) + D_Cd_S(Le,d,c,g)
+
+  Cd_aux.append(CD_total)
