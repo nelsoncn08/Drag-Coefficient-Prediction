@@ -1,0 +1,10 @@
+for i in M:
+  Cd(i)
+
+Cd_final.append(Cd_aux)
+
+for i in Cd_final:
+  plt.plot(M, i)
+
+plt.legend()
+plt.show()
