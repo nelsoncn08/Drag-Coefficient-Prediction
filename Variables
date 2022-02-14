@@ -1,0 +1,117 @@
+import numpy as np
+from scipy.interpolate import CubicSpline
+import matplotlib.pyplot as plt
+
+### Calcular o Coeficiente de Arrato do Corpo (Seção 1.1) ###
+
+# h -> altitude (em pés)
+# M -> número correspondente de Mach
+# L -> Comprimento total do foguete (inches)
+# K -> Constante do material (fibra de vidro)
+# d -> diâmetro máximo do foguete (em inches)
+# Sb -> área molhada total do foguete (em square inches)
+
+# Número de Mach  e constante do material arbitrários
+M = np.linspace(0.001, 4, 100)
+K = 0.00016
+
+# Vamos considerar a velocidade do som constante e igual a 340 m/s, ou seja, igual a 1115.49 ft/s
+# Para isso, pela equação que define a velocidade do som abaixo, utilizaremos como base uma altura de 2400 pés
+h = 2400
+L = 94.4882
+d = 4.96063
+Sb = 992.1644
+
+
+# ---------------------------------------------------------------------------#
+
+
+### Calcular o Coeficiente de Arrasto das Aletas (Seção 1.2) ###
+
+# Cr -> corda na raíz da aleta
+# Sf -> área molhada total de cada aleta
+# t -> espessura máxima de cada aleta na raíz
+# X_tc_av -> distância da ponta da aleta até a espessura máxima (normalizada)
+# Nf -> número total de aletas
+
+#Definindo com base nas propriedades do Photon
+Ct = 2.3622
+Cr = 8.2677
+Sf = 25.1101
+t = 0.90945
+X_tc_av = 11.811
+Nf = 4
+
+
+# ---------------------------------------------------------------------------#
+
+
+### Calcular o Arrasto por Atrito nas Protuberâncias (Seção 1.3) ###
+
+# Lp -> comprimento da protuberância (inches)
+# A -> corte transversal da área máxima de protuberância
+# Sp -> área molhada de protuberância
+
+#Valores arbitrários
+Lp = 1
+A = 1
+Sp = 1
+
+Protuberancia = False
+
+
+# ---------------------------------------------------------------------------#
+
+
+### Arrasto devido a excrescência (Seção 1.4) ###
+
+Excrescencia = False
+
+
+# ---------------------------------------------------------------------------#
+
+
+### Coeficiente de Atrito Total e Interferência de Arrasto (Seção 1.5) ###
+
+# Kf = Fator de interferência mútua de aletas e 'lug' de lançamento com corpo
+
+
+# ---------------------------------------------------------------------------#
+
+
+### Cálculo do Coeficiente de Arrasto de Base para Mach > 0.6 (Seções 2.1 e 2.2) ###
+
+#Será considerado L0 como o comprimento total do foguete excluindo o nose (2.1m)
+#Também será considerado que o diâmetro da base é igual ao diâmetro máximo do corpo do foguete
+
+L0 = 82.6772
+db = 4.9606
+
+
+# ---------------------------------------------------------------------------#
+
+
+### Coeficiente de Arrasto de Onda Transônica (Seção 3.0) ###
+
+# LN -> Comprimento do nariz do foguete
+# Lb -> Comprimento total do foguete
+# Le -> Comprimento efetivo do foguete
+
+LN = 11.811
+Le = 94.4882
+Lb = 94.4882
+
+
+# ---------------------------------------------------------------------------#
+
+
+### Coeficiente de Arrasto de Onda Supersônica (Seção 4.0) ###
+
+
+# ---------------------------------------------------------------------------#
+
+
+### Coeficiente de Arrasto Total (Seção 5.0) ###
+
+Cd_aux = []
+Cd_final = []
